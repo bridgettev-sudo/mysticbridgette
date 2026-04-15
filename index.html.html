@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mystic Bridgette — Psychic Readings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=IM+Fell+English:ital@0;1&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: #d4a800;
+    color: #0d0a00;
+    font-family: 'Raleway', sans-serif;
+    font-weight: 400;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CURSOR */
+  .cursor {
+    width: 12px; height: 12px; background: #0d0a00;
+    border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999;
+    transform: translate(-50%, -50%); transition: transform 0.15s ease;
+  }
+  .cursor-ring {
+    width: 38px; height: 38px; border: 2px solid rgba(0,0,0,0.4);
+    border-radius: 50%; position: fixed; pointer-events: none; z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: left 0.1s ease, top 0.1s ease, width 0.3s, height 0.3s;
+  }
+  a, button, .service-card, .dot { cursor: none; }
+
+  /* PARTICLES */
+  #particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 22px 60px;
+    background: linear-gradient(to bottom, rgba(212,168,0,0.97), transparent);
+    backdrop-filter: blur(4px);
+  }
+  .nav-brand {
+    font-family: 'Cinzel Decorative', serif; font-size: 1rem; font-weight: 700;
+    color: #0d0a00; text-decoration: none; letter-spacing: 0.05em;
+  }
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-links a {
+    font-size: 0.68rem; letter-spacing: 0.22em; text-transform: uppercase;
+    color: #0d0a00; text-decoration: none; font-weight: 500; opacity: 0.7; transition: opacity 0.3s;
+  }
+  .nav-links a:hover { opacity: 1; }
+
+  /* HERO */
+  #hero {
+    position: relative; min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center; padding: 120px 30px 80px; overflow: hidden;
+    background: radial-gradient(ellipse at 50% 30%, #ffe033 0%, #f0c800 25%, #d4a800 55%, #a07800 100%);
+  }
+  .orb { position: absolute; border-radius: 50%; filter: blur(60px); pointer-events: none; }
+  .orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(255,238,0,0.45), transparent 70%); top: -10%; left: -15%; }
+  .orb-2 { width: 600px; height: 600px; background: radial-gradient(circle, rgba(160,120,0,0.4), transparent 70%); top: 20%; right: -20%; }
+  .orb-3 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(255,240,160,0.3), transparent 70%); bottom: 5%; left: 25%; }
+
+  .moon {
+    position: absolute; top: 60px; right: 120px; width: 90px; height: 90px;
+    border-radius: 50%; background: radial-gradient(circle at 40% 40%, #ffffff, #fffae0);
+    box-shadow: 0 0 40px rgba(255,255,255,0.6), 0 0 80px rgba(255,238,0,0.3);
+    animation: moonGlow 4s ease-in-out infinite;
+  }
+  .moon::after {
+    content: ''; position: absolute; top: 8px; right: -5px;
+    width: 70px; height: 70px; border-radius: 50%; background: #d4a800;
+  }
+  @keyframes moonGlow {
+    0%,100% { box-shadow: 0 0 40px rgba(255,255,255,0.6), 0 0 80px rgba(255,238,0,0.3); }
+    50%      { box-shadow: 0 0 70px rgba(255,255,255,0.9), 0 0 130px rgba(255,238,0,0.5); }
+  }
+
+  .star-deco {
+    position: absolute; font-size: 1.2rem;
+    animation: starFloat var(--dur) ease-in-out infinite; animation-delay: var(--delay);
+    opacity: 0.5; color: rgba(0,0,0,0.45);
+  }
+  @keyframes starFloat {
+    0%,100% { transform: translateY(0) rotate(0deg); opacity: 0.5; }
+    50%      { transform: translateY(-12px) rotate(15deg); opacity: 1; }
+  }
+
+  .hero-eyebrow {
+    font-family: 'IM Fell English', serif; font-style: italic;
+    font-size: 1.05rem; color: #0d0a00; margin-bottom: 16px; letter-spacing: 0.1em;
+  }
+  .hero-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(2.6rem, 8vw, 7.5rem); font-weight: 900; line-height: 1; letter-spacing: 0.02em;
+    background: linear-gradient(135deg, #3d2d00 0%, #a07800 20%, #ffe033 40%, #fff0a0 50%, #ffe033 60%, #a07800 80%, #3d2d00 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    animation: shimmer 3s linear infinite;
+  }
+  .hero-title .mystic, .hero-title .bridgette { display: block; }
+  @keyframes shimmer { 0% { background-position: 200% center; } 100% { background-position: -200% center; } }
+
+  .hero-tagline {
+    margin-top: 22px; font-family: 'IM Fell English', serif; font-style: italic;
+    font-size: clamp(1rem, 2.5vw, 1.35rem); color: rgba(13,10,0,0.75); letter-spacing: 0.08em;
+  }
+
+  .hero-services {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 36px;
+  }
+  .pill {
+    background: rgba(0,0,0,0.18); border: 1px solid rgba(0,0,0,0.3);
+    color: #0d0a00; font-size: 0.68rem; letter-spacing: 0.22em;
+    text-transform: uppercase; padding: 9px 20px; font-weight: 500;
+    backdrop-filter: blur(6px); transition: background 0.3s;
+  }
+  .pill:hover { background: rgba(0,0,0,0.3); }
+
+  .hero-cta {
+    margin-top: 50px; display: flex; gap: 18px; align-items: center;
+    flex-wrap: wrap; justify-content: center;
+  }
+  .btn-main {
+    font-family: 'Cinzel Decorative', serif; font-size: 0.65rem; letter-spacing: 0.2em;
+    padding: 18px 48px; background: #0d0a00; color: #fffae0;
+    border: none; text-decoration: none; transition: transform 0.3s, box-shadow 0.3s;
+    position: relative; overflow: hidden;
+  }
+  .btn-main::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, #5a4400, #1a1200); opacity: 0; transition: opacity 0.3s;
+  }
+  .btn-main:hover { transform: translateY(-3px); box-shadow: 0 16px 48px rgba(0,0,0,0.4); }
+  .btn-main:hover::before { opacity: 1; }
+  .btn-main span { position: relative; z-index: 1; }
+
+  .btn-outline {
+    font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: #0d0a00; text-decoration: none;
+    border-bottom: 1px solid rgba(0,0,0,0.4); padding-bottom: 3px; transition: border-color 0.3s;
+  }
+  .btn-outline:hover { border-color: #0d0a00; }
+
+  .scroll-cue {
+    position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    opacity: 0; animation: fadeIn 1s ease 2s forwards;
+  }
+  .scroll-cue small { font-size: 0.58rem; letter-spacing: 0.35em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+  .scroll-bar { width: 1px; height: 45px; background: linear-gradient(to bottom, rgba(0,0,0,0.4), transparent); animation: barPulse 2.2s ease infinite; }
+  @keyframes barPulse { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+  /* SECTION COMMON */
+  section { position: relative; z-index: 1; }
+  .section-wrap { max-width: 1200px; margin: 0 auto; }
+
+  .label {
+    font-family: 'Cinzel Decorative', serif; font-size: 0.55rem;
+    letter-spacing: 0.5em; text-transform: uppercase; color: #fffae0; opacity: 0.9; margin-bottom: 14px;
+  }
+  h2 {
+    font-family: 'Cinzel Decorative', serif; font-size: clamp(1.6rem, 4vw, 3rem);
+    font-weight: 700; color: #fffae0; line-height: 1.15; letter-spacing: 0.02em;
+  }
+
+  /* ABOUT */
+  #about { padding: 130px 60px; background: linear-gradient(to bottom, #a07800, #d4a800); }
+  .about-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 100px; align-items: center; }
+
+  .eye-wrap { display: flex; justify-content: center; align-items: center; aspect-ratio: 1; position: relative; }
+  .eye-triangle { width: 300px; height: 300px; position: relative; animation: rotate 30s linear infinite; }
+  .triangle-svg { width: 100%; height: 100%; }
+  .eye-center {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -40%);
+    width: 90px; height: 55px;
+    background: radial-gradient(ellipse, #fff0a0 0%, #d4a800 100%);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    box-shadow: 0 0 30px rgba(255,238,0,0.6); overflow: hidden;
+    animation: eyeBlink 6s ease-in-out infinite;
+  }
+  .eye-pupil {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 36px; height: 36px;
+    background: radial-gradient(circle at 35% 35%, #5b3a00, #000); border-radius: 50%;
+  }
+  .eye-pupil::after {
+    content: ''; position: absolute; top: 18%; left: 20%;
+    width: 10px; height: 10px; background: rgba(255,255,255,0.6); border-radius: 50%;
+  }
+  @keyframes eyeBlink {
+    0%,90%,100% { transform: translate(-50%,-40%) scaleY(1); }
+    95%          { transform: translate(-50%,-40%) scaleY(0.05); }
+  }
+  @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+  .about-text p { font-size: 1rem; line-height: 1.95; color: rgba(255,250,224,0.9); margin-top: 20px; }
+
+  /* SERVICES */
+  #services { padding: 120px 60px; background: linear-gradient(to bottom, #d4a800, #f0c800); }
+  .services-head { text-align: center; margin-bottom: 70px; }
+  .services-head h2 { margin-top: 10px; }
+
+  .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; max-width: 1100px; margin: 0 auto; }
+  .service-card {
+    background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.35);
+    padding: 50px 36px; position: relative; overflow: hidden;
+    transition: background 0.4s, transform 0.3s; backdrop-filter: blur(4px);
+  }
+  .service-card:hover { background: rgba(255,255,255,0.38); transform: translateY(-4px); }
+  .svc-icon { font-size: 2.5rem; display: block; margin-bottom: 18px; animation: iconFloat var(--dur,4s) ease-in-out infinite; animation-delay: var(--delay,0s); }
+  @keyframes iconFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  .service-card h3 { font-family: 'Cinzel Decorative', serif; font-size: 0.9rem; font-weight: 700; color: #0d0a00; margin-bottom: 14px; line-height: 1.3; }
+  .service-card p { font-size: 0.82rem; line-height: 1.85; color: rgba(13,10,0,0.72); }
+  .svc-cta {
+    display: inline-block; margin-top: 24px; font-size: 0.62rem; letter-spacing: 0.25em;
+    text-transform: uppercase; color: #0d0a00; text-decoration: none;
+    border-bottom: 1px solid rgba(0,0,0,0.35); padding-bottom: 2px; font-weight: 500; transition: border-color 0.3s;
+  }
+  .svc-cta:hover { border-color: #0d0a00; }
+
+  /* TESTIMONIALS */
+  #testimonials { padding: 130px 60px; background: linear-gradient(to bottom, #f0c800, #d4a800); text-align: center; }
+  .testi-head { margin-bottom: 70px; }
+  .testi-head h2 { margin-top: 10px; }
+  .testimonial { display: none; animation: fadeIn 0.7s ease; }
+  .testimonial.active { display: block; }
+  .quote-glyph { font-family: 'IM Fell English', serif; font-size: 7rem; line-height: 0.4; color: rgba(0,0,0,0.12); display: block; margin-bottom: 24px; }
+  blockquote { font-family: 'IM Fell English', serif; font-size: clamp(1.2rem,2.8vw,1.75rem); font-style: italic; line-height: 1.65; color: #0d0a00; max-width: 720px; margin: 0 auto 36px; }
+  cite { font-style: normal; font-size: 0.65rem; letter-spacing: 0.35em; text-transform: uppercase; color: rgba(0,0,0,0.5); font-weight: 500; }
+  .dots { display: flex; justify-content: center; gap: 12px; margin-top: 50px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(0,0,0,0.2); transition: background 0.3s, transform 0.3s; }
+  .dot.active { background: #0d0a00; transform: scale(1.3); }
+
+  /* BOOKING */
+  #booking { padding: 130px 60px; background: linear-gradient(to bottom, #d4a800, #a07800); }
+  .booking-inner { max-width: 750px; margin: 0 auto; text-align: center; }
+  .booking-inner h2 { margin: 10px 0 16px; }
+  .booking-inner > p { font-size: 0.95rem; line-height: 1.9; color: #fffae0; margin-bottom: 56px; }
+  .booking-inner > p strong { font-weight: 600; }
+
+  .booking-form { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; text-align: left; }
+  .form-group { display: flex; flex-direction: column; gap: 7px; }
+  .form-group.full { grid-column: 1/-1; }
+  .form-group label { font-size: 0.58rem; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(255,250,224,0.7); font-weight: 500; }
+  .form-group input, .form-group select, .form-group textarea {
+    background: rgba(0,0,0,0.18); border: 1px solid rgba(0,0,0,0.25); color: #0d0a00;
+    padding: 14px 16px; font-family: 'Raleway', sans-serif; font-size: 0.85rem;
+    outline: none; transition: border-color 0.3s, background 0.3s; appearance: none;
+  }
+  .form-group select option { background: #a07800; color: #0d0a00; }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: rgba(0,0,0,0.55); background: rgba(0,0,0,0.25); }
+  .form-group textarea { resize: none; height: 100px; }
+  ::placeholder { color: rgba(13,10,0,0.35); }
+  .form-submit { grid-column: 1/-1; margin-top: 8px; }
+  .form-submit .btn-main { width: 100%; display: block; padding: 20px; font-size: 0.65rem; text-align: center; }
+
+  /* FOOTER */
+  footer {
+    padding: 50px 60px; background: #5a4400;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;
+  }
+  .footer-brand { font-family: 'Cinzel Decorative', serif; font-size: 0.9rem; font-weight: 700; color: #fff; letter-spacing: 0.05em; }
+  footer small { font-size: 0.67rem; letter-spacing: 0.1em; color: rgba(255,255,255,0.5); }
+  .footer-links { display: flex; gap: 28px; }
+  .footer-links a { font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.55); text-decoration: none; transition: color 0.3s; }
+  .footer-links a:hover { color: #fff; }
+
+  /* REVEAL */
+  .reveal { opacity: 1; transform: none; transition: opacity 0.85s ease, transform 0.85s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+  .rd1 { transition-delay: 0.1s; } .rd2 { transition-delay: 0.22s; } .rd3 { transition-delay: 0.34s; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn  { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 900px) {
+    nav { padding: 18px 24px; } .nav-links { display: none; }
+    #about { padding: 80px 24px; } .about-grid { grid-template-columns: 1fr; gap: 50px; }
+    .eye-triangle { width: 200px; height: 200px; }
+    #services, #testimonials, #booking { padding: 80px 24px; }
+    .services-grid { grid-template-columns: 1fr; } .booking-form { grid-template-columns: 1fr; }
+    footer { flex-direction: column; text-align: center; padding: 40px 24px; }
+    .moon { width: 60px; height: 60px; right: 20px; top: 80px; } .moon::after { width: 46px; height: 46px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<canvas id="particles"></canvas>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-brand">Mystic Bridgette</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#testimonials">Testimonials</a></li>
+    <li><a href="#booking">Book Now</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
+  <div class="moon"></div>
+  <span class="star-deco" style="top:15%;left:12%;--dur:5s;--delay:0s;">✦</span>
+  <span class="star-deco" style="top:22%;left:80%;--dur:6s;--delay:1s;">✧</span>
+  <span class="star-deco" style="top:65%;left:8%;--dur:4.5s;--delay:0.5s;">✶</span>
+  <span class="star-deco" style="top:70%;left:88%;--dur:5.5s;--delay:1.5s;">✦</span>
+  <span class="star-deco" style="top:40%;left:4%;--dur:7s;--delay:2s;">★</span>
+
+  <p class="hero-eyebrow">✦ Trusted Psychic &amp; Spiritual Guide ✦</p>
+  <h1 class="hero-title"><span class="mystic">Mystic</span><span class="bridgette">Bridgette</span></h1>
+  <p class="hero-tagline">Psychic Readings &nbsp;·&nbsp; Tarot &nbsp;·&nbsp; Astrology &nbsp;·&nbsp; Mediumship</p>
+
+  <div class="hero-services">
+    <div class="pill">🔮 Psychic Readings</div>
+    <div class="pill">🃏 Tarot</div>
+    <div class="pill">⭐ Astrology</div>
+    <div class="pill">👁 Psychic Medium</div>
+    <div class="pill">🌐 Remote Viewing</div>
+    <div class="pill">🌿 Spiritual Healing</div>
+  </div>
+
+  <div class="hero-cta">
+    <a href="#booking" class="btn-main"><span>✦ Book a Reading</span></a>
+    <a href="#services" class="btn-outline">Explore Services</a>
+  </div>
+
+  <div class="scroll-cue"><div class="scroll-bar"></div><small>Scroll</small></div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-wrap about-grid">
+    <div class="eye-wrap reveal">
+      <div class="eye-triangle">
+        <svg class="triangle-svg" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="150,20 280,260 20,260" fill="none" stroke="rgba(255,238,0,0.5)" stroke-width="1.5"/>
+          <polygon points="150,8 292,272 8,272" fill="none" stroke="rgba(255,238,0,0.2)" stroke-width="0.8" stroke-dasharray="6 4"/>
+          <line x1="150" y1="20" x2="150" y2="260" stroke="rgba(255,238,0,0.15)" stroke-width="0.8"/>
+          <line x1="20" y1="260" x2="215" y2="140" stroke="rgba(255,238,0,0.15)" stroke-width="0.8"/>
+          <line x1="280" y1="260" x2="85" y2="140" stroke="rgba(255,238,0,0.15)" stroke-width="0.8"/>
+          <circle cx="150" cy="150" r="65" fill="none" stroke="rgba(255,238,0,0.25)" stroke-width="0.8" stroke-dasharray="4 8"/>
+          <circle cx="150" cy="150" r="85" fill="none" stroke="rgba(255,238,0,0.12)" stroke-width="0.5"/>
+          <circle cx="150" cy="20" r="4" fill="rgba(255,238,0,0.7)"/>
+          <circle cx="280" cy="260" r="4" fill="rgba(255,238,0,0.7)"/>
+          <circle cx="20"  cy="260" r="4" fill="rgba(255,238,0,0.7)"/>
+        </svg>
+      </div>
+      <div class="eye-center"><div class="eye-pupil"></div></div>
+    </div>
+    <div class="about-text">
+      <p class="label reveal">✦ About Bridgette</p>
+      <h2 class="reveal">A Gift Born<br>of the Unseen</h2>
+      <p class="reveal rd1">Internationally known Top Psychic with 30 years+ experience. Phone call and email readings available.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="services-head">
+    <p class="label reveal">✦ What I Offer</p>
+    <h2 class="reveal">My Services</h2>
+  </div>
+  <div class="services-grid">
+    <div class="service-card reveal" style="--dur:4s;--delay:0s;">
+      <span class="svc-icon">🔮</span>
+      <h3>Psychic Readings</h3>
+      <p>Tap into the energetic field surrounding your life. Bridgette's clairvoyant insight reveals what is hidden, illuminates what lies ahead, and empowers your next step.</p>
+      <a href="#booking" class="svc-cta">Book Now →</a>
+    </div>
+    <div class="service-card reveal rd1" style="--dur:4.5s;--delay:0.5s;">
+      <span class="svc-icon">🃏</span>
+      <h3>Tarot Reading</h3>
+      <p>The ancient language of the tarot speaks truths the conscious mind cannot reach. Full Celtic Cross and custom spreads for love, career, and spiritual direction.</p>
+      <a href="#booking" class="svc-cta">Book Now →</a>
+    </div>
+    <div class="service-card reveal rd2" style="--dur:5s;--delay:1s;">
+      <span class="svc-icon">♑</span>
+      <h3>Astrology</h3>
+      <p>Your natal chart is the cosmos speaking your name. Discover planetary influences shaping your purpose, your relationships, and the timing of what is coming.</p>
+      <a href="#booking" class="svc-cta">Book Now →</a>
+    </div>
+    <div class="service-card reveal" style="--dur:4.2s;--delay:0.2s;">
+      <span class="svc-icon">👁️</span>
+      <h3>Psychic Medium</h3>
+      <p>Bridgette serves as a bridge between worlds, facilitating deeply personal contact with loved ones who have passed — held with compassion, integrity, and love.</p>
+      <a href="#booking" class="svc-cta">Book Now →</a>
+    </div>
+    <div class="service-card reveal rd1" style="--dur:4.8s;--delay:0.7s;">
+      <span class="svc-icon">🌐</span>
+      <h3>Remote Viewing</h3>
+      <p>Distance is no barrier to perception. Bridgette can tune into distant locations, missing persons, objects, or situations regardless of physical proximity.</p>
+      <a href="#booking" class="svc-cta">Book Now →</a>
+    </div>
+    <div class="service-card reveal rd2" style="--dur:5.2s;--delay:1.2s;">
+      <span class="svc-icon">🌿</span>
+      <h3>Spiritual Healing</h3>
+      <p>Drawing on ancient healing traditions, Bridgette channels restorative energy to clear blockages, balance your aura, and restore harmony to your mind, body, and spirit.</p>
+      <a href="#booking" class="svc-cta">Book Now →</a>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="testi-head">
+    <p class="label reveal">✦ What People Say</p>
+    <h2 class="reveal">Real Experiences</h2>
+  </div>
+  <div class="testimonial active">
+    <span class="quote-glyph">"</span>
+    <blockquote>Bridgette knew things about my family no stranger could possibly know. The reading left me with peace I had not felt in years. I tell everyone I know to go see her.</blockquote>
+    <cite>— Nomsa K.</cite>
+  </div>
+  <div class="testimonial">
+    <span class="quote-glyph">"</span>
+    <blockquote>Every reading was eerily accurate — the atmosphere she created was incredible. Our whole team still talks about it months later.</blockquote>
+    <cite>— David P.</cite>
+  </div>
+  <div class="testimonial">
+    <span class="quote-glyph">"</span>
+    <blockquote>Her remote viewing ability is extraordinary. She described details no one else could have known. I was completely astonished.</blockquote>
+    <cite>— Carmen L.</cite>
+  </div>
+  <div class="testimonial">
+    <span class="quote-glyph">"</span>
+    <blockquote>I had a meditation spiritual healing session on a call reading with Bridgette, and she brought through my deceased family members with great love and success. We could finally let them go and release the pain of mourning. A truly life-changing experience I will never forget.</blockquote>
+    <cite>— Anonymous</cite>
+  </div>
+  <div class="dots">
+    <div class="dot active" data-i="0"></div>
+    <div class="dot" data-i="1"></div>
+    <div class="dot" data-i="2"></div>
+    <div class="dot" data-i="3"></div>
+  </div>
+</section>
+
+<!-- BOOKING -->
+<section id="booking">
+  <div class="booking-inner">
+    <p class="label reveal">✦ Begin</p>
+    <h2 class="reveal">Book a Reading</h2>
+    <p class="reveal">Send email to: <strong style="color:#fffae0; font-size:1.1rem;">bridgettev@gmail.com</strong> for call and payment details.</p>
+    <a href="mailto:bridgettev@gmail.com" class="btn-main" style="display:inline-block; margin-top:10px;"><span>✦ Email Bridgette Now ✦</span></a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">Mystic Bridgette</div>
+  <small>© 2026 · All readings for guidance purposes only</small>
+  <div class="footer-links">
+    <a href="#">Instagram</a>
+    <a href="#">Facebook</a>
+    <a href="#">Contact</a>
+  </div>
+</footer>
+
+<script>
+const cur = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+document.addEventListener('mousemove', e => {
+  cur.style.left = e.clientX+'px'; cur.style.top = e.clientY+'px';
+  ring.style.left = e.clientX+'px'; ring.style.top = e.clientY+'px';
+});
+document.querySelectorAll('a,button,.service-card,.dot').forEach(el => {
+  el.addEventListener('mouseenter', () => { cur.style.transform='translate(-50%,-50%) scale(2.5)'; ring.style.width='60px'; ring.style.height='60px'; });
+  el.addEventListener('mouseleave', () => { cur.style.transform='translate(-50%,-50%) scale(1)'; ring.style.width='38px'; ring.style.height='38px'; });
+});
+
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+let W, H, pts = [];
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+function makeParticles() {
+  pts = [];
+  for (let i = 0; i < 160; i++) {
+    pts.push({ x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.3+0.2,
+      a: Math.random()*0.5+0.1, sp: Math.random()*0.008+0.002, ph: Math.random()*Math.PI*2,
+      col: Math.random()>0.5 ? 'rgba(255,238,0,' : 'rgba(255,255,255,' });
+  }
+}
+function draw(t) {
+  ctx.clearRect(0,0,W,H);
+  pts.forEach(p => {
+    const a = p.a*(0.4+0.6*Math.sin(t*p.sp+p.ph));
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle = p.col+a+')'; ctx.fill();
+  });
+  requestAnimationFrame(ts => draw(ts/1000));
+}
+resize(); makeParticles(); draw(0);
+window.addEventListener('resize', () => { resize(); makeParticles(); });
+
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+const tms = document.querySelectorAll('.testimonial');
+const dts = document.querySelectorAll('.dot');
+let cur2 = 0;
+function sh
